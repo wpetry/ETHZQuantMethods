@@ -6,21 +6,23 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
+  titlePanel("Modeling structure populations"),
   
-  # Sidebar with a slider input for number of bins 
+  # Show a plot of the generated distribution
   sidebarLayout(
     sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
+      helpText("Specify the structure of the matrix model using the options below."),
+      h3("Set model options"),
+      sliderInput(
+        "nbins",
+        label="Number of life cycle classes",
+        min=1L,max=10L,value=3L,step=1L,ticks=FALSE
+      ),
+      radioButtons("matType", "Matrix type", c("Leslie (age/stage)", "Lefkovitch (size)"))
     ),
     
-    # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("distPlot")
+      rHandsontableOutput("hot")
     )
   )
 ))
