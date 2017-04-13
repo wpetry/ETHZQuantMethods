@@ -14,7 +14,7 @@ shinyUI(fluidPage(
       helpText("Specify the structure of the matrix model using the options below."),
       h3("Set model options"),
       sliderInput(
-        "nbins",
+        inputId="nbins",
         label="Number of life cycle classes",
         min=1L,max=10L,value=3L,step=1L,ticks=FALSE
       ),
@@ -22,6 +22,7 @@ shinyUI(fluidPage(
     ),
     
     mainPanel(
+      h3("Transition matrix"),
       rHandsontableOutput("hot")
     )
   )
