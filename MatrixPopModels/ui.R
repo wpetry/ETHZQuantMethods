@@ -17,7 +17,7 @@ shinyUI(fluidPage(
       sliderInput(
         inputId="nbins",
         label="Number of life cycle classes",
-        min=1L,max=10L,value=10L,step=1L,ticks=FALSE
+        min=1L,max=10L,value=8L,step=1L,ticks=FALSE
       )
       #,radioButtons("matType", "Matrix type", c("Leslie (age/stage)", "Lefkovitch (size)"))
     ),
