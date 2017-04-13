@@ -10,15 +10,16 @@ This 3-week module introduces structured population models and explores the uniq
 
 ## Tools:
 - Matrix population models (biology -> model -> analysis)
+- Sensitivity analysis
 - Differential equations
 
 ## 25 April 2017: Introduction to matrix population models
 Instructor: Will Petry
 
 1. Lecture (30-45 min)
-  - What is population structure?
-  - Mapping life cycles to transition matrices
-  - Basic analysis of matrix population models
+    - What is population structure?
+    - Mapping life cycles to transition matrices
+    - Basic analysis of matrix population models
 2. Demonstration of Shiny app
 3. Exercises
 
@@ -26,20 +27,20 @@ Instructor: Will Petry
 Instructors: Will Petry & Chris Johnson
 
 1. Lecture, part 1 (20 min)
-  - Adding multiple structuring variables (sex as a case study)
-  - Paradox of two models
+    - Adding multiple structuring variables (sex as a case study)
+    - Paradox of two models
 2. Exploration of two-sex model Shiny app
 3. Analyses of non-linear matrix population models
 4. Lecture, part 2
-  - Differential equations
-  - Oscillations/dynamic equilibria
+    - Differential equations
+    - Oscillations/dynamic equilibria
 
 ## 9 May 2017: Environmental sensitivity of demographic rates
 Instructor: Chris Johnson
 
 1. Lecture
-  - Vital rate responses to temperature
-  - Multivariate optimization of fitness components
+    - Vital rate responses to temperature
+    - Multivariate optimization of fitness components
 
 # References
 - Caswell, H. (2001). Matrix population models. John Wiley & Sons, Ltd., Chicago.
