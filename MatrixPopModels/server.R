@@ -5,10 +5,11 @@ library(rhandsontable)
 library(popbio)
 library(ggplot2)
 library(dplyr)
+library(htmlwidgets)
 
 # DF is the user interface, hideDF will stay in background to populate DF when
 # matrix dimensions change
-data(tortoise)
+data(hudsonia)
 hideDF <- DF <- hudsonia$A88
 N<-1000
 ts<-250
@@ -41,10 +42,11 @@ shinyServer(function(input, output) {
         rhandsontable(DF, useTypes = T, stretchH = "none", digits = 6,
                       colHeaders=paste0("class",1:input$nbins),
                       rowHeaders=paste0("class",1:input$nbins)) %>%
-          hot_cols(renderer=htmlwidgets::JS("safeHtmlRenderer"))
+          hot_cols(renderer=JS("safeHtmlRenderer"))
       }else{
-        rhandsontable(data.frame(X1=DF[1,1]), useTypes = F, stretchH = "none",
-                      colHeaders="class1", rowHeaders="class1")
+        rhandsontable(DF[1,1], useTypes = T, stretchH = "none", digits = 6,
+                      colHeaders="class1", rowHeaders="class1") %>%
+          hot_cols(renderer=JS("safeHtmlRenderer"))
       }
   })
   
@@ -52,20 +54,20 @@ shinyServer(function(input, output) {
     lammat<-matrix(c(N,rep(0,times=input$nbins-1),
                      rep(0,times=input$nbins*ts)),
                    ncol=ts+1)
-    # lammat<-matrix(c(N,rep(0,times=bins-1),
-    #                  rep(0,times=bins*ts)),
-    #                ncol=ts+1)
     for(i in 1:ts){
       lammat[,i+1]<-DF %*% lammat[,i]
     }
     n<-colSums(lammat)
-    simpop<-data.frame(year=0:ts,lam=n/lag(n))
+    simpop<-data.frame(year=0:ts,lam=n/lag(n)) %>% na.omit(.)
     
-    ggplot(data=simpop,aes(x=year,y=lam))+
+    suppressWarnings(ggplot(data=simpop,aes(x=year,y=lam))+
       geom_line(size=2,color="dodgerblue3")+
       geom_hline(yintercept=1,linetype="dashed")+
-      scale_x_continuous(name="Year")+
-      scale_y_continuous(name="Population growth rate")+
-      theme_bw()
+      scale_x_continuous(name="Time steps")+
+      scale_y_continuous(name="Population growth rate (λ)")+
+      theme_bw()+
+      theme(panel.grid=element_blank(),
+            axis.text=element_text(size=18),
+            axis.title=element_text(size=24)))
   })
 })
