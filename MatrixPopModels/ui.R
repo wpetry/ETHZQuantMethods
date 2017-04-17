@@ -18,6 +18,12 @@ shinyUI(fluidPage(
         inputId="nbins",
         label="Number of life cycle classes",
         min=1L,max=10L,value=6L,step=1L,ticks=FALSE
+      ),
+      numericInput(
+        inputId="ts",
+        label="Projection interval",
+        value=250,
+        min=2
       )
     ),
 

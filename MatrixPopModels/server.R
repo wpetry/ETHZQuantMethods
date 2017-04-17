@@ -12,7 +12,7 @@ library(htmlwidgets)
 data(hudsonia)
 hideDF <- DF <- hudsonia$A88
 N<-1000
-ts<-250
+#ts<-250
 
 # Define server logic to take user input matrix model and project population dynamics
 shinyServer(function(input, output) {
@@ -52,13 +52,13 @@ shinyServer(function(input, output) {
   
   output$lambda <- renderPlot({
     lammat<-matrix(c(N,rep(0,times=input$nbins-1),
-                     rep(0,times=input$nbins*ts)),
-                   ncol=ts+1)
-    for(i in 1:ts){
-      lammat[,i+1]<-DF %*% lammat[,i]
+                     rep(0,times=input$nbins*input$ts)),
+                   ncol=input$ts+1)
+    for(i in 1:input$ts){
+      lammat[,i+1]<-values[["DF"]] %*% lammat[,i]
     }
     n<-colSums(lammat)
-    simpop<-data.frame(year=0:ts,lam=n/lag(n)) %>% na.omit(.)
+    simpop<-data.frame(year=0:input$ts,lam=n/lag(n)) %>% na.omit(.)
     
     suppressWarnings(ggplot(data=simpop,aes(x=year,y=lam))+
       geom_line(size=2,color="dodgerblue3")+
