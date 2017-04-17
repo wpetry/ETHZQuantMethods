@@ -14,12 +14,14 @@ hideDF <- DF <- hudsonia$A88
 N<-1000
 #ts<-250
 
+VEC<-matrix(c(N,0,0,0,0,0),ncol=1,dimnames=list(paste0("c_",1:6),"N"))
+
 # Define server logic to take user input matrix model and project population dynamics
 shinyServer(function(input, output) {
    
-  values <- reactiveValues()
+  values <- reactiveValues()  # is this doing anything?
   
-  ## Handsontable
+  ## Handsontable transition matrix
   observe({
     if (!is.null(input$hot)) {
       DF = hot_to_r(input$hot)[1:input$nbins,1:input$nbins]
@@ -37,21 +39,46 @@ shinyServer(function(input, output) {
   
   output$hot <- renderRHandsontable({
     DF <- values[["DF"]]
-    if (!is.null(DF))
+    if (!is.null(DF)){
       if (input$nbins>1){
         rhandsontable(DF, useTypes = T, stretchH = "none", digits = 6,
-                      colHeaders=paste0("class",1:input$nbins),
-                      rowHeaders=paste0("class",1:input$nbins)) %>%
+                      colHeaders=paste0("c_",1:input$nbins),
+                      rowHeaders=paste0("c_",1:input$nbins)) %>%
           hot_cols(renderer=JS("safeHtmlRenderer"))
       }else{
         rhandsontable(DF[1,1], useTypes = T, stretchH = "none", digits = 6,
-                      colHeaders="class1", rowHeaders="class1") %>%
+                      colHeaders="c_1", rowHeaders="c_1") %>%
           hot_cols(renderer=JS("safeHtmlRenderer"))
       }
+    }
   })
   
+  ## Handsontable population vector
+  observe({
+    if (!is.null(input$hotvec)) {
+      VEC = hot_to_r(input$hotvec)
+    } else {
+      if (is.null(values[["VEC"]])){
+        VEC <- VEC
+      }else{
+        VEC <- values[["VEC"]]
+      }
+    }
+    values[["VEC"]] <- VEC
+  })
+  
+  output$hotvec <- renderRHandsontable({
+    VEC <- values[["VEC"]]
+    if (!is.null(VEC)){
+      rhandsontable(VEC, useTypes = T, stretchH = "none", digits = 6,
+                    colHeaders = "N", rowHeaders = "") %>%
+        hot_cols(renderer=JS("safeHtmlRenderer"))
+    }
+  })
+  
+  
   output$lambda <- renderPlot({
-    lammat<-matrix(c(N,rep(0,times=input$nbins-1),
+    lammat<-matrix(c(values[["VEC"]],
                      rep(0,times=input$nbins*input$ts)),
                    ncol=input$ts+1)
     for(i in 1:input$ts){

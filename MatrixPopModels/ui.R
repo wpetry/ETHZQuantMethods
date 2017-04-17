@@ -21,17 +21,28 @@ shinyUI(fluidPage(
       ),
       numericInput(
         inputId="ts",
-        label="Projection interval",
+        label="Projection interval (time)",
         value=250,
-        min=2
+        min=2,
+        max=5000
       )
     ),
 
     mainPanel(
-      h3("Transition matrix"),
-      rHandsontableOutput("hot"),
-      br(),
-      plotOutput("lambda")
+      fluidRow(
+        h3("Transition matrix")
+      ),
+      fluidRow(
+        column(width=8,
+               rHandsontableOutput("hot")
+        ),
+        column(width=4,
+               rHandsontableOutput("hotvec")
+        )
+      ),
+      fluidRow(
+        plotOutput("lambda")
+      )  
     )
   )
 ))
