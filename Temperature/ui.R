@@ -18,7 +18,11 @@ shinyUI(fluidPage(
                    "Temperature (°C):",
                    min = 0,
                    max = 40,
+<<<<<<< HEAD
                    value = 20,
+=======
+                   value = 19.85,
+>>>>>>> 1cdbe1eb9b7a2e49bbc87144a57de55263d6e938
                    step = 0.1),
       h4("Starting population densities"),
       numericInput("startA",
