@@ -108,7 +108,7 @@ shinyServer(function(input, output) {
                  d_J = params["d_JR",]*exp(params["A_dJ",]*((1/params["T_R",])-(1/TempK))),
                  d_A = params["d_AR",]*exp(params["A_dA",]*((1/params["T_R",])-(1/TempK))))
     state <- c(J = input$startJ, A = input$startA)
-    time <- seq(0, 100, by = 1)
+    time <- seq(0, input$xmax, by = 1)
     
     # project population dynamics
     popdyn <- as.data.frame(ode(func = TempMod, y = state, parms = Tparams, times = time)) %>%
@@ -117,7 +117,7 @@ shinyServer(function(input, output) {
     # draw the population dynamics figure
     ggplot(popdyn, aes(x = time, y = popdens, group = stage, color = stage))+
       geom_line(size = 3)+
-      scale_x_continuous(name = "Time")+
+      scale_x_continuous(name = "Time", limits = c(0, input$xmax))+
       scale_y_continuous(name = "Population Density", limits = c(0, input$ymax))+
       scale_color_manual(name = "Stage", breaks = c("J", "A"), labels = c("Juveniles", "Adults"), values = c(J_color, A_color))+
       theme_bw()+
