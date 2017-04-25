@@ -14,16 +14,12 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       helpText("Move the slider to adjust the temperature of the environment. The model will use the parameters from the vital rate distributions (top panels) and project the population dynamics (lower figure)."),
-       sliderInput("Temp",
-                   "Temperature (°C):",
-                   min = 0,
-                   max = 40,
-<<<<<<< HEAD
-                   value = 20,
-=======
-                   value = 19.85,
->>>>>>> 1cdbe1eb9b7a2e49bbc87144a57de55263d6e938
-                   step = 0.1),
+      sliderInput("Temp",
+                  "Temperature (°C):",
+                  min = 0,
+                  max = 40,
+                  value = 20,
+                  step = 0.1),
       h4("Starting population densities"),
       numericInput("startA",
                    "Adults:",
@@ -48,7 +44,7 @@ shinyUI(fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("POPDYN")
+      plotOutput("POPDYN")
     )
   )
 ))

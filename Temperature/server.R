@@ -15,7 +15,7 @@ K2C <- function(x){
 # define model parameters
 params <- matrix(c(1,293,5,0.1,283,15000,5000,70000,278,295,0.1,5000,0.1,2500),
                  dimnames=list(c("r_Topt","T_opt","s","m_R","T_R","A_m","A_L","A_H","T_L","T_H","d_JR","A_dJ","d_AR","A_dA"),
-                               c("value")))
+                               c("val")))
 
 # calculate vital rate plot data
 vitalrates <- data.frame(TempK = C2K(seq(1, 40, by = 0.1))) %>%
@@ -27,6 +27,15 @@ vitalrates <- data.frame(TempK = C2K(seq(1, 40, by = 0.1))) %>%
            ((exp(params["A_m",]*
                    ((1/params["T_R",])-(1/TempK))))/
               (1+exp(params["A_L",]*((1/params["T_L",])-(1/TempK)))+exp(params["A_H",]*((1/params["T_H",])-(1/TempK))))))
+
+# define ODE model
+TempMod <- function (time, state, Tparams) {
+  with(as.list(c(state, Tparams)), {
+    dJ = r*A*exp(-A)-m*J-d_J*J
+    dA = m*J-d_A*A
+    return(list(c(dJ, dA)))
+  })
+}
 
 
 # Define server logic required to draw a histogram
