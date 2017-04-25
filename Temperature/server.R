@@ -3,6 +3,7 @@
 library(shiny)
 library(deSolve)
 library(dplyr)
+library(tidyr)
 
 # define temperature conversion functions
 C2K <- function(x){
