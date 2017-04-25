@@ -2,7 +2,7 @@
 
 library(shiny)
 library(deSolve)
-library(tidyverse)
+library(dplyr)
 
 # define temperature conversion functions
 C2K <- function(x){
@@ -12,21 +12,61 @@ K2C <- function(x){
   x-273.15
 }
 
-# define model parameters
+# set colorscheme
+J_color <- "dodgerblue2"
+A_color <- "firebrick2"
+
+# define fixed model parameters
 params <- matrix(c(1,293,5,0.1,283,15000,5000,70000,278,295,0.1,5000,0.1,2500),
                  dimnames=list(c("r_Topt","T_opt","s","m_R","T_R","A_m","A_L","A_H","T_L","T_H","d_JR","A_dJ","d_AR","A_dA"),
-                               c("val")))
+                               c("value")))
 
-# calculate vital rate plot data
-vitalrates <- data.frame(TempK = C2K(seq(1, 40, by = 0.1))) %>%
+# calculate vital rate plot data, make plot templates
+vitalrates <- data.frame(TempC = seq(0, 40, by = 0.1)) %>%
+  mutate(TempK = C2K(TempC)) %>%
   mutate(Repro = params["r_Topt",]*exp(-((TempK-params["T_opt",])^2)/(2*(params["s",])^2)),
-         Devel_J = params["d_JR",]*exp(params["A_dJ",]*((1/params["T_R",])-(1/TempK))),
-         Devel_A = params["d_AR",]*exp(params["A_dA",]*((1/params["T_R",])-(1/TempK))),
-         Mort = params["m_R",]*
+         Devel = params["m_R",]*
            (TempK/params["T_R",])*
            ((exp(params["A_m",]*
                    ((1/params["T_R",])-(1/TempK))))/
-              (1+exp(params["A_L",]*((1/params["T_L",])-(1/TempK)))+exp(params["A_H",]*((1/params["T_H",])-(1/TempK))))))
+              (1+exp(params["A_L",]*((1/params["T_L",])-(1/TempK)))+exp(params["A_H",]*((1/params["T_H",])-(1/TempK))))),
+         Mort_J = params["d_JR",]*exp(params["A_dJ",]*((1/params["T_R",])-(1/TempK))),
+         Mort_A = params["d_AR",]*exp(params["A_dA",]*((1/params["T_R",])-(1/TempK))))
+
+t_vital_repro <- ggplot(vitalrates, aes(x = TempC, y = Repro))+
+  geom_line(size = 2, color = J_color)+
+  scale_x_continuous(name = "Temperature (°C)", limits = c(0, 40))+
+  scale_y_continuous(name = "Reproduction", limits = c(0, 1))+
+  scale_color_hue()+
+  theme_bw()+
+  theme(axis.title = element_text(size = 24, face = "bold"),
+        axis.text = element_text(size = 18),
+        legend.title = element_text(size = 18, face = "bold"),
+        legend.text = element_text(size = 16),
+        panel.grid = element_blank())
+t_vital_devel <- ggplot(vitalrates, aes(x = TempC, y = Devel))+
+  geom_line(size = 2, color = J_color)+
+  scale_x_continuous(name = "Temperature (°C)", limits = c(0, 40))+
+  scale_y_continuous(name = "Development", limits = c(0, 0.2))+
+  scale_color_hue()+
+  theme_bw()+
+  theme(axis.title = element_text(size = 24, face = "bold"),
+        axis.text = element_text(size = 18),
+        legend.title = element_text(size = 18, face = "bold"),
+        legend.text = element_text(size = 16),
+        panel.grid = element_blank())
+t_vital_mort <- ggplot(vitalrates, aes(x = TempC))+
+  geom_line(aes(y = Mort_J), size = 2, color = J_color)+
+  geom_line(aes(y = Mort_A), size = 2, color = A_color)+
+  scale_x_continuous(name = "Temperature (°C)", limits = c(0, 40))+
+  scale_y_continuous(name = "Mortality", limits = c(0, 0.6))+
+  scale_color_hue()+
+  theme_bw()+
+  theme(axis.title = element_text(size = 24, face = "bold"),
+        axis.text = element_text(size = 18),
+        legend.title = element_text(size = 18, face = "bold"),
+        legend.text = element_text(size = 16),
+        panel.grid = element_blank())
 
 # define ODE model
 TempMod <- function (time, state, Tparams) {
@@ -41,10 +81,23 @@ TempMod <- function (time, state, Tparams) {
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    
+  output$vital_repro <- renderPlot({
+    t_vital_repro+
+      geom_vline(xintercept = input$Temp)
+  })
+  output$vital_devel <- renderPlot({
+    t_vital_devel+
+      geom_vline(xintercept = input$Temp)
+  })
+  output$vital_mort <- renderPlot({
+    t_vital_mort+
+      geom_vline(xintercept = input$Temp)
+  })
+  
   output$POPDYN <- renderPlot({
     TempK <- C2K(input$Temp)
     
-    # calculate population parameters
+    # calculate dynamic population parameters
     Tparams <- c(r = params["r_Topt",]*exp(-((TempK-params["T_opt",])^2)/(2*(params["s",])^2)),
                  m = params["m_R",]*
                    (TempK/params["T_R",])*
@@ -65,12 +118,13 @@ shinyServer(function(input, output) {
       geom_line(size = 3)+
       scale_x_continuous(name = "Time")+
       scale_y_continuous(name = "Population Density", limits = c(0, input$ymax))+
-      scale_color_discrete(name = "Stage", breaks = c("J", "A"), labels = c("Juveniles", "Adults"))+
+      scale_color_manual(name = "Stage", breaks = c("J", "A"), labels = c("Juveniles", "Adults"), values = c(J_color, A_color))+
       theme_bw()+
       theme(axis.title = element_text(size = 24, face = "bold"),
             axis.text = element_text(size = 18),
             legend.title = element_text(size = 18, face = "bold"),
             legend.text = element_text(size = 16),
+            legend.position = "top",
             panel.grid = element_blank())
     
   })

@@ -1,7 +1,6 @@
 # User-interface definition for Temperature Model Shiny app
 
 library(shiny)
-library(rhandsontable)
 library(ggplot2)
 
 # Define UI for application that draws a histogram
@@ -44,7 +43,20 @@ shinyUI(fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(
-      plotOutput("POPDYN")
+      tabsetPanel(
+        tabPanel("Model dynamics",
+                 fluidRow(
+                   column(4, plotOutput("vital_repro")),
+                   column(4, plotOutput("vital_devel")),
+                   column(4, plotOutput("vital_mort"))
+                 ),
+                 fluidRow(
+                   column(12, plotOutput("POPDYN"))
+                 )
+        ),
+        tabPanel("Model description",
+                 withMathJax(includeMarkdown("ModelDescription.md")))
+      )
     )
   )
 ))
